@@ -1,0 +1,41 @@
+{
+  "name": "@yamato-daiwa/universal-reactive-webpack-loader",
+  "version": "0.0.0",
+  "description": "The webpack loader for Pug templates of \"@yamato-daiwa/universal-reactive\", the frontend library.",
+  "keywords": [
+    "webpack",
+    "loader"
+  ],
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Takeshi Tokugawa",
+    "email": "tokugawa.takesi@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TokugawaTakeshi/Yamato-Daiwa-Universal-Reactive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Universal-Reactive/issues"
+  },
+  "homepage": "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Universal-Reactive",
+  "peerDependencies": {
+    "webpack": "^5.0.0",
+    "@yamato-daiwa/es-extensions-browserjs": "~1.8.0",
+    "@yamato-daiwa/universal-reactive-templates-compiler": "0.0.0"
+  },
+  "dependencies": {
+    "@yamato-daiwa/universal-reactive-templates-compiler": "0.0.0",
+    "pug-error": "2.1.0",
+    "pug-lexer": "5.0.1",
+    "pug-parser": "6.0.0"
+  }
+}

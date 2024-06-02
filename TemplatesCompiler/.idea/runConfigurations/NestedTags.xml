@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="NestedTags" type="NodeJsTestRunner" folderName="01-Regular">
+    <node-interpreter value="project" />
+    <working-dir value="$PROJECT_DIR$" />
+    <language value="TYPE_SCRIPT" />
+    <typescript-loader value="TSX" />
+    <envs />
+    <scope-kind value="TEST_FILE" />
+    <test-file value="$PROJECT_DIR$/Tests/01-Regular/00-NestedTags/NestedTags.test.ts" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,113 @@
+$projectBuilding:
+
+  $commonSettings:
+
+    $selectiveExecutions:
+
+      Distributable:
+        $tasksAndSourceFilesSelection:
+          $ECMA_ScriptLogicProcessing: [ Source ]
+
+      Tests:
+
+        $tasksAndSourceFilesSelection:
+          $markupProcessing: [ Tests ]
+          $stylesProcessing: [ Tests ]
+          $ECMA_ScriptLogicProcessing: [ Tests ]
+
+        $browserLiveReloadingSetupID: Tests
+
+
+  $markupProcessing:
+
+    $common:
+      $buildingModeDependent:
+        $localDevelopment:
+          $mustResolveResourcesPointersToRelativePaths: true
+
+    $entryPointsGroups:
+
+      Tests:
+
+        $sourceFilesTopDirectoryRelativePath: Tests/Source
+
+        $partialsRecognition:
+          $excludeFilesWithPrefixes: "_"
+          $excludeSubdirectoriesWithPrefixes: "_"
+          $excludeSubdirectoriesWithNames: [ "GUI_Components" ]
+
+        $buildingModeDependent:
+          $localDevelopment:
+            $outputTopDirectoryRelativePath: Tests/Build
+
+
+  $stylesProcessing:
+
+    $entryPointsGroups:
+
+      Tests:
+
+        $sourceFilesTopDirectoryRelativePath: Tests/Source
+
+        $partialsRecognition:
+          $excludeFilesWithPrefixes: "_"
+          $excludeSubdirectoriesWithPrefixes: "_"
+          $excludeSubdirectoriesWithNames: [ "GUI_Components" ]
+
+        $buildingModeDependent:
+          $localDevelopment:
+            $outputTopDirectoryRelativePath: Tests/Build
+
+
+  $ECMA_ScriptLogicProcessing:
+
+    $entryPointsGroups:
+
+      Source:
+
+        $singleEntryPointSourceFileRelativePath: Source/index.ts
+
+        $targetRuntime:
+          $type: BROWSER
+
+        $distributing:
+          $exposingOfExportsFromEntryPoints:
+            $mustExpose: true
+          $typeScriptTypesDeclarations:
+            $mustGenerate: true
+
+        $buildingModeDependent:
+
+          $production:
+            $outputTopDirectoryRelativePath: "Distributable"
+            $revisioning: { $disable: true }
+
+      Tests:
+
+        $sourceFilesTopDirectoryRelativePath: Tests/Source
+
+        $targetRuntime:
+          $type: BROWSER
+
+        $partialsRecognition:
+          $excludeFilesWithPrefixes: "_"
+          $excludeSubdirectoriesWithPrefixes: "_"
+          $excludeSubdirectoriesWithNames: [ "GUI_Components" ]
+
+        $buildingModeDependent:
+          $localDevelopment:
+            $outputTopDirectoryRelativePath: Tests/Build
+
+
+  $browserLiveReloading:
+
+    $setups:
+
+      Tests:
+
+        $localServer:
+
+          $rootDirectoryRelativePath: Tests/Build
+          $customStartingFileNameWithExtension: Tests.html
+
+        $openInBrowsers: chrome

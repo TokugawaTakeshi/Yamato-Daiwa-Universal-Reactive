@@ -1,0 +1,56 @@
+{
+  "name": "@yamato-daiwa/universal-reactive-templates-compiler",
+  "version": "0.0.0",
+  "description": "The templates compiler for \"@yamato-daiwa/universal-reactive\", the frontend library.",
+  "keywords": [
+    "frontend",
+    "compiler"
+  ],
+  "main": "./Distributable/index.js",
+  "types": "./Distributable/index.d.ts",
+  "files": [
+    "Distributable"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Takeshi Tokugawa",
+    "email": "tokugawa.takesi@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TokugawaTakeshi/Yamato-Daiwa-Universal-Reactive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Universal-Reactive/issues"
+  },
+  "homepage": "https://github.com/TokugawaTakeshi/Yamato-Daiwa-Universal-Reactive",
+  "dependencies": {
+    "@yamato-daiwa/es-extensions": "1.8.0",
+    "@yamato-daiwa/es-extensions-browserjs": "1.8.0"
+  },
+  "devDependencies": {
+    "@types/js-beautify": "1.14.3",
+    "@types/node": "22.18.8",
+    "@yamato-daiwa/style_guides": "0.9.0",
+    "js-beautify": "1.15.4",
+    "pug-error": "2.1.0",
+    "pug-lexer": "5.0.1",
+    "pug-parser": "6.0.0",
+    "rimraf": "6.0.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.2"
+  },
+  "scripts": {
+    "Check Types": "tsc --noEmit",
+    "Lint": "eslint Source Tests",
+    "Run Tests": "node --require tsx/cjs --test \"Tests/**/*.test.ts\"",
+    "Rebuild Distributable Without Preliminary Cleaning": "tsc",
+    "Rebuild Distributable": "rimraf Distributable && tsc",
+    "Rebuild Distributable and Realize Alpha": "npm run \"Rebuild Distributable\" && npm publish --tag alpha",
+    "Rebuild Distributable and Realize RC": "npm run \"Rebuild Distributable\" && npm publish --tag rc"
+  }
+}

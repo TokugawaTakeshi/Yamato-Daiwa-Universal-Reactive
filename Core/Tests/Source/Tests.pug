@@ -1,0 +1,26 @@
+extends ../../node_modules/@yamato-daiwa/frontend/PagesTemplates/StaticPreviewAnywherePageTemplate.pug
+
+
+block append Metadata
+
+  -
+
+    StaticPreviewAnywherePage__YDF.configure({
+
+      metadata: {
+        title: "Tests"
+      },
+
+      topHeading: "Tests",
+
+      tableOfContents: [
+
+        {
+          title: "Counter Application",
+          URI: "@Tests/Counter/Counter-EntryPoint.test",
+          progressStatus: StaticPreviewAnywherePage__YDF.PageDevelopmentProgressStatuses.implementationInProgress
+        }
+
+      ]
+
+    });
