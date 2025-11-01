@@ -5,9 +5,14 @@ namespace PugAST {
     block = "Block",
     tag = "Tag",
     code = "Code",
-    text = "Text"
+    text = "Text",
+    conditional = "Conditional"
   }
 
+  type JavaScriptExpression = string;
+
+
+  /* ━━━ Node Objects ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   export type Node = {
 
     type: NodeTypes;
@@ -23,6 +28,8 @@ namespace PugAST {
 
   };
 
+
+  /* ━━━ Blocks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   /** @description Generic container of Nodes. */
   export type Block =
 
@@ -79,7 +86,15 @@ namespace PugAST {
   };
 
 
-  /* ━━━ Tags ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* ━━━ Text ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  export type Text =
+
+      ValueNode &
+
+      { type: NodeTypes.text; };
+
+
+  /* ━━━ Tag ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   export type CommonTag =
 
       AttributedNode &
@@ -99,14 +114,6 @@ namespace PugAST {
         type: NodeTypes.tag;
         name: string;
       };
-
-
-  /* ━━━ Text ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  export type Text =
-
-      ValueNode &
-
-      { type: NodeTypes.text; };
 
 
   /* ━━━ Code ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -129,6 +136,19 @@ namespace PugAST {
         /** @description Whether the node is the result of a string interpolation */
         isInline: boolean;
 
+      };
+
+
+  /* ━━━ Code Helpers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  export type Conditional =
+
+      Node &
+
+      {
+        type: NodeTypes.conditional;
+        test: JavaScriptExpression;
+        consequent: Block;
+        alternate: Conditional | Block | null;
       };
 
 }

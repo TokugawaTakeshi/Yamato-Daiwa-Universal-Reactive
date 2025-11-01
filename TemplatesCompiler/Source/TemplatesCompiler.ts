@@ -2,12 +2,14 @@ import type PugAST from "./PugAST/PugAST";
 import isTagPugNode from "./PugAST/isTagPugNode";
 import isCodePugNode from "./PugAST/isCodePugNode";
 import isTextPugNode from "./PugAST/isTextPugNode";
+import isConditionalPugNode from "./PugAST/isConditionalPugNode";
 
 import {
   AlgorithmMismatchError,
   isNotUndefined,
   isUndefined,
-  Logger
+  Logger,
+  removeSpecificCharacterFromCertainPosition
 } from "@yamato-daiwa/es-extensions";
 
 
@@ -24,8 +26,36 @@ type TagNodeProcessingResult = Readonly<{
 
 export class TemplatesCompiler {
 
+  /* ━━━ Static Fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  private static readonly eventsAttributesAndNativeJavaScriptEventsNamesCorrespondence: ReadonlyMap<string, string> = new Map([
+
+    /* ┅┅┅ Mouse Events ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+    [ "onLeftClick", "click" ],
+    [ "onDoubleLeftClick", "dblclick" ],
+    [ "onRightClick", "auxclick" ],
+    [ "onMouseDown", "mousedown " ],
+    [ "onMouseUp", "mouseup" ],
+    [ "onMouseMoved", "mousemove" ],
+    [ "onMouseOver", "mouseover" ],
+    [ "onMouseOut", "mouseout" ],
+    [ "onMouseEntered", "mouseenter" ],
+    [ "onMouseLeft", "mouseleave" ],
+
+    /* ┅┅┅ Keyboard Events ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+    [ "onKeyPressed", "keypress" ],
+    [ "onKeyUp", "keyup" ],
+    [ "onKeyDown", "keydown" ],
+    [ "onInput", "input" ],
+
+    /* ┅┅┅ Common ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+    [ "onChange", "change" ]
+
+  ]);
+
+
+  /* ━━━ Instance Fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   private readonly elementsCounters: Array<number> = [];
-  private readonly stateFieldsKeys: Set<string> = new Set();
+  private readonly reactiveStateFieldsKeys: Set<string> = new Set();
   private currentDepth__numerationFrom0: number = -1;
   private readonly namesOfElementsOfTopLevel: Set<string> = new Set();
 
@@ -36,13 +66,13 @@ export class TemplatesCompiler {
 
     return "{" +
 
-      "generateInitialDOM() {" +
+      "generateInitialDOM({ $reactiveState, $constantState, $eventsHandlers }) {" +
         selfInstance.processPugBlock(rawView).outputCodeStatements.join("") +
         `return [${ Array.from(selfInstance.namesOfElementsOfTopLevel).join(",") }];` +
       "}," +
 
       "onStateFieldsChangedHandlers: new Map([" +
-        Array.from(selfInstance.stateFieldsKeys).
+        Array.from(selfInstance.reactiveStateFieldsKeys).
             map((stateFieldKey: string): string => `[ "${ stateFieldKey }", new Set() ],`).
             join(",") +
       "])," +
@@ -91,9 +121,12 @@ export class TemplatesCompiler {
         }
 
 
-        this.stateFieldsKeys.add(pugNode.val);
+        if (pugNode.val.startsWith("$reactiveState.")) {
+          this.reactiveStateFieldsKeys.add(pugNode.val.replace("$reactiveState.", ""));
+        }
 
         statementsForCurrentBlock.push(
+          `${ parentElementVariableName }.textContent = String(${ pugNode.val });`,
           TemplatesCompiler.generateCodeBlockForCodeNode(pugNode, parentElementVariableName)
         );
 
@@ -108,6 +141,15 @@ export class TemplatesCompiler {
           `${ parentElementVariableName }.textContent = "${ pugNode.val }";`
         );
 
+        continue;
+
+      }
+
+
+      if (isConditionalPugNode(pugNode)) {
+        statementsForCurrentBlock.push(
+          `if (stateFields.${ pugNode.test }) {}`
+        );
       }
 
     }
@@ -139,8 +181,31 @@ export class TemplatesCompiler {
 
       if (attribute.name.startsWith("@")) {
 
+        const eventName: string = removeSpecificCharacterFromCertainPosition({
+          targetCharacter: "@",
+          fromFirstPosition: true,
+          targetString: attribute.name
+        });
+
+        const targetNativeEvent: string | undefined = TemplatesCompiler.
+            eventsAttributesAndNativeJavaScriptEventsNamesCorrespondence.get(eventName);
+
+        if (isUndefined(targetNativeEvent)) {
+          Logger.throwErrorWithFormattedMessage({
+            errorType: "UnknownYDUR_Event",
+            title: "Unknown YDUR Event",
+            description: `Event "${ targetNativeEvent }" is unknown.`,
+            occurrenceLocation: "TemplatesCompiler.processPugBlock(targetPugBLock, parentElementVariableName)"
+          });
+        }
+
+
         statementsForTagNode.push(
-          TemplatesCompiler.generateMethodReferenceRegistrationDeclaration(attribute.val, elementVariableName)
+          TemplatesCompiler.generateMethodReferenceRegistrationDeclaration({
+            elementVariableName,
+            nativeEventName: targetNativeEvent,
+            handlerName: attribute.val
+          })
         );
 
         continue;
@@ -194,8 +259,15 @@ export class TemplatesCompiler {
 
 
   private static generateCodeBlockForCodeNode(codeNode: PugAST.Code, parentElementVariableName: string): string {
-    return `this.onStateFieldsChangedHandlers.get("${ codeNode.val }").` +
+
+    if (codeNode.val.startsWith("$reactiveState")) {
+      return `this.onStateFieldsChangedHandlers.get("${ codeNode.val.replace("$reactiveState.", "") }").` +
         `add(value => { ${ parentElementVariableName }.textContent = String(value); });`;
+    }
+
+
+    return "";
+
   }
 
   private static generateElementVariableInitializingDeclaration(
@@ -211,13 +283,35 @@ export class TemplatesCompiler {
   }
 
   private static generateMethodReferenceRegistrationDeclaration(
-    methodName: string,
-    elementVariableName: string
+    {
+      elementVariableName,
+      nativeEventName,
+      handlerName
+    }: Readonly<{
+      elementVariableName: string;
+      nativeEventName: string;
+      handlerName: string;
+    }>
   ): string {
-    return "this.methodsReferences.set(" +
-      `"${ methodName }",` +
-      `handler => { LeftClickEventListener.createAndAssign({ targetElement: ${ elementVariableName }, handler }) }` +
-      ");";
+    return `(() => {
+      
+      const { handler, options } = $eventsHandlers.get("${ handlerName }");
+      
+      ${ elementVariableName }.addEventListener(
+        "${ nativeEventName }",
+        event => {
+        
+          if (options.mustKeepDefaultBehaviour !== true) {
+            event.stopPropagation();
+          }
+          
+          handler(event);  
+        
+        },
+        { capture: options.eventPropagation === "CAPTURING", once: options.mustBeCalledOnce }
+      );
+      
+    })();`;
   }
 
 }

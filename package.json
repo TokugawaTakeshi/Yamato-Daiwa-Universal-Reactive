@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "scripts": {
+    "Set Version and Symlinkify Internal Dependencies": "ydmh version",
+    "Desymlinky Internal Dependencies and Publish": "ydmh publish"
+  },
+  "devDependencies": {
+    "@yamato-daiwa/monorepo-helper": "../YamatoDaiwaMonorepoHelper"
+  },
+  "ydmh": {
+    "packages": [
+      {
+        "relativePath": "Core",
+        "productionBuildingScript": "Rebuild Distributable"
+      },
+      {
+        "relativePath": "TemplatesCompiler",
+        "productionBuildingScript": "Rebuild Distributable"
+      },
+      {
+        "relativePath": "AdaptersForProjectBuildingSystems/Webpack",
+        "productionBuildingScript": "Rebuild Distributable"
+      }
+    ]
+  }
+}

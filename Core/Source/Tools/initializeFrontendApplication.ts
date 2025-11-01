@@ -13,7 +13,7 @@ export default function initializeFrontendApplication(
   }>
 ): void {
 
-  new RootComponent().$$mount(
+  new RootComponent().$mount(
     getExpectedToBeSingleDOM_Element({
       selector: mountingPointSelector,
       contextElement: document

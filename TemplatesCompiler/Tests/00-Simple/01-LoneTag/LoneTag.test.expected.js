@@ -1,5 +1,9 @@
 export default {
-  generateInitialDOM() {
+  generateInitialDOM({
+    $reactiveState,
+    $constantState,
+    $eventsHandlers
+  }) {
     const element_0 = document.createElement("div");
     return [element_0];
   },

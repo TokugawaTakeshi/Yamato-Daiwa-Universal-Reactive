@@ -1,5 +1,9 @@
 export default {
-  generateInitialDOM() {
+  generateInitialDOM({
+    $reactiveState,
+    $constantState,
+    $eventsHandlers
+  }) {
     return [];
   },
   onStateFieldsChangedHandlers: new Map([]),

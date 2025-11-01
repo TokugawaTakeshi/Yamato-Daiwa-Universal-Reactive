@@ -6,11 +6,15 @@ import { Logger } from "@yamato-daiwa/es-extensions";
 
 
 Testing.test(
-  "Tag with Text",
+  "Tag with Reactive State Variable Content",
   (): void => {
      Assert.strictEqual(
-       generateViewObjectFormattedCode("00-Simple/02-TagWithText/TagWithText.test.pug"),
-       getExpectedFormatedVieObjectCodeFromFile("00-Simple/02-TagWithText/TagWithText.test.expected.js")
+       generateViewObjectFormattedCode(
+         "00-Simple/03-TagWithReactiveStateVariableContent/TagWithReactiveStateVariableContent.test.pug"
+       ),
+       getExpectedFormatedVieObjectCodeFromFile(
+         "00-Simple/03-TagWithReactiveStateVariableContent/TagWithReactiveStateVariableContent.test.expected.js"
+       )
      );
   }
 ).catch(Logger.logPromiseError);

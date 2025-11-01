@@ -1,7 +1,12 @@
 export default {
-  generateInitialDOM() {
+  generateInitialDOM({
+    $reactiveState,
+    $constantState,
+    $eventsHandlers
+  }) {
     const element_0 = document.createElement("div");
-    element_0.textContent = "Some text";
+    element_0.setAttribute("id", "main");
+    element_0.setAttribute("class", "box");
     return [element_0];
   },
   onStateFieldsChangedHandlers: new Map([]),
