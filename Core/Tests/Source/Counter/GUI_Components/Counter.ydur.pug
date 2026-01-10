@@ -1,13 +1,13 @@
-samp= $currentValue
+samp= $reactiveState.currentValue
 
 .Counter-ActionBar
 
   button(
     type="button"
-    @click=onClickIncrementingButton
+    @onLeftClick=onClickIncrementingButton
   ) Increment
 
   button(
     type="button"
-    @click=onClickDecrementingButton
+    @onLeftClick=onClickDecrementingButton
   ) Decrement

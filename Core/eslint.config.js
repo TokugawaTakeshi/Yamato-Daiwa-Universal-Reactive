@@ -10,6 +10,17 @@ module.exports = [
     ]
   },
 
-  ...YamatoDaiwaStyleGuides
+  ...YamatoDaiwaStyleGuides,
+
+  {
+    files: [
+      "Source/Decorators/EventHandler.ts",
+      "Source/Types/EventHandlersDataMap.ts",
+      "Source/GeneralizedView.ts"
+    ],
+    rules: {
+      "@typescript-eslint/no-redeclare": "off"
+    }
+  }
 
 ];

@@ -7,15 +7,17 @@ import componentTemplate from "./Counter.ydur.pug";
 @YDFR.View(componentTemplate)
 export default class Counter extends YDFR.Component {
 
-  @YDFR.StateField
-  public $currentValue: number = 0;
+  @YDFR.ReactiveState
+  protected currentValue: number = 0;
 
-  public onClickIncrementingButton(): void {
-    this.$currentValue++;
+  @YDFR.EventHandler()
+  protected onClickIncrementingButton(): void {
+    this.currentValue++;
   }
 
-  public onClickDecrementingButton(): void {
-    this.$currentValue--;
+  @YDFR.EventHandler()
+  protected onClickDecrementingButton(): void {
+    this.currentValue--;
   }
 
 }

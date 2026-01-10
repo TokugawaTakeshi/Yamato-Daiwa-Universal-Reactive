@@ -1,5 +1,5 @@
 import * as YDFR from "../../../Source";
-import Counter from "././GUI_Components/Counter";
+import Counter from "./GUI_Components/Counter";
 
 
 YDFR.initializeFrontendApplication({

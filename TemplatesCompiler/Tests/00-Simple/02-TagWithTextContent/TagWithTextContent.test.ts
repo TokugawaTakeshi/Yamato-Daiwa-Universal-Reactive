@@ -6,11 +6,11 @@ import { Logger } from "@yamato-daiwa/es-extensions";
 
 
 Testing.test(
-  "Tag with Variable",
+  "Tag with Text Content",
   (): void => {
      Assert.strictEqual(
-       generateViewObjectFormattedCode("00-Simple/03-TagWithVariable/TagWithVariable.test.pug"),
-       getExpectedFormatedVieObjectCodeFromFile("00-Simple/03-TagWithVariable/TagWithVariable.test.expected.js")
+       generateViewObjectFormattedCode("00-Simple/02-TagWithTextContent/TagWithTextContent.test.pug"),
+       getExpectedFormatedVieObjectCodeFromFile("00-Simple/02-TagWithTextContent/TagWithTextContent.test.expected.js")
      );
   }
 ).catch(Logger.logPromiseError);
