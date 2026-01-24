@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tag with Reactive State Variable Content" type="NodeJsTestRunner" folderName="00-Simple">
+  <configuration default="false" name="Tag with Reactive State Variable Content" type="NodeJsTestRunner" folderName="02 - Lone Tag with Content">
     <node-interpreter value="project" />
     <working-dir value="$PROJECT_DIR$" />
     <language value="TYPE_SCRIPT" />
     <typescript-loader value="TSX" />
     <envs />
     <scope-kind value="TEST_FILE" />
-    <test-file value="$PROJECT_DIR$/Tests/00-Simple/03-TagWithReactiveStateVariableContent/TagWithReactiveStateVariableContent.test.ts" />
+    <test-file value="$PROJECT_DIR$/Tests/02-TagWithContent/01-TagWithReactiveStateVariableContent/TagWithReactiveStateVariableContent.test.ts" />
     <method v="2" />
   </configuration>
 </component>

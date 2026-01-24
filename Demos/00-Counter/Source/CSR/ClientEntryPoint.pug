@@ -1,0 +1,20 @@
+extends ../../node_modules/@yamato-daiwa/frontend/PagesTemplates/RegularWebPageTemplate.pug
+
+
+block append Metadata
+
+  -
+
+    RegularWebPageTemplate__YDF.configure({
+      metadata: {
+        title: "Counter Application"
+      },
+      scriptsURIs: {
+        atEndOfBody: [ "@SPA" ]
+      }
+    });
+
+
+block append PageContent
+
+  #APPLICATION_ROOT

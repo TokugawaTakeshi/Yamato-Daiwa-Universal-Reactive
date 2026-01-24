@@ -1,6 +1,6 @@
 {
   "name": "@yamato-daiwa/universal-reactive-webpack-loader",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The webpack loader for Pug templates of \"@yamato-daiwa/universal-reactive\", the frontend library.",
   "keywords": [
     "webpack",

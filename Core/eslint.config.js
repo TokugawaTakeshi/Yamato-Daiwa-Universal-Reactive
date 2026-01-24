@@ -5,8 +5,10 @@ module.exports = [
 
   {
     ignores: [
-      "Distributable/*",
-      "Tests/Build/*"
+      "index.js",
+      "client.js",
+      "server.js",
+      "GeneratedTypes/*"
     ]
   },
 
@@ -14,9 +16,9 @@ module.exports = [
 
   {
     files: [
-      "Source/Decorators/EventHandler.ts",
-      "Source/Types/EventHandlersDataMap.ts",
-      "Source/GeneralizedView.ts"
+      "Source/Common/Decorators/EventHandler.ts",
+      "Source/Common/Types/EventHandlersDataMap.ts",
+      "Source/Common/GeneralizedView.ts"
     ],
     rules: {
       "@typescript-eslint/no-redeclare": "off"

@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tag with Constant State Variable Content" type="NodeJsTestRunner" folderName="00-Simple">
+  <configuration default="false" name="Tag with Constant State Variable Content" type="NodeJsTestRunner">
     <node-interpreter value="project" />
     <working-dir value="$PROJECT_DIR$" />
     <language value="TYPE_SCRIPT" />
     <typescript-loader value="TSX" />
     <envs />
     <scope-kind value="TEST_FILE" />
-    <test-file value="$PROJECT_DIR$/Tests/00-Simple/04-TagWithConstantStateVariableContent/TagWithConstantStateVariableContent.test.ts" />
+    <test-file value="$PROJECT_DIR$/Tests/02-TagWithContent/02-TagWithConstantStateVariableContent/TagWithConstantStateVariableContent.test.ts" />
     <method v="2" />
   </configuration>
 </component>

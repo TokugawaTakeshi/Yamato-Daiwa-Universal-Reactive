@@ -18,21 +18,6 @@ module.exports = [
         project: "tsconfig.eslint.json"
       }
     }
-  },
-
-  {
-    files: [ "Tests/**/*.test.ts" ],
-    rules: {
-
-      /* A higher version of Node.js is required for developers. */
-      "n/no-unsupported-features/node-builtins": [
-        "error",
-        {
-          version: ">=22.0.0"
-        }
-      ]
-
-    }
   }
 
 ];

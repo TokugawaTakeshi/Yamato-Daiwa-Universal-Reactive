@@ -2,7 +2,7 @@
 
 <figure align="center">
   <img 
-    src="https://imgur.com/a/NMyzesK" 
+    src="https://i.imgur.com/SAH0hKE.jpeg" 
     alt="The decorative image shows that the library is in development."
   >
   <figcaption style="text-align: center;">
@@ -14,8 +14,8 @@
 
 ## What is Being Developed
 
-The object-oriented programming-based library for the frontend Web+ development alternative to React, Vue, Svelte and 
-  the like.
+The object-oriented programming-based library for the frontend Web+ development alternative to Angular, React, Vue, Svelte, 
+  and the like.
 
 No plans to position it as a framework because it is intended to be the just the _tool_ taking care of typical frontend 
   development tasks without stealing too much attention and forcing of specific architecture, naming and directories 
@@ -30,7 +30,8 @@ The following feature may be pros of cons depending on your preferences.
 + [Pug](https://pugjs.org/api/getting-started.html) is the only language for templates. No plain HTML support planned. 
 + No new file names extensions like `.vue` or `.jsx`.
 + No new syntaxes like Vue single file components or JSX. Just plain Pug and TypeScript.
-+ Project building tool like Webpack is required.
++ Built-in SSR. Unlike Nuxt/Next, the SSR scenario was respected since ealry stage of development
++ The project building tool like Webpack is required.
 
 
 ### Planned
@@ -42,7 +43,7 @@ The sequence may be changed during the development.
 + [ ] Nested components
 + [ ] Routing
 + [ ] Shared state
-+ [ ] SSR
++ [x] SSR
 
 
 ## Ecosystem
@@ -50,7 +51,7 @@ The sequence may be changed during the development.
 <dl>
 
   <dt><a href="Core">@yamato-daiwa/universal-reactive — Core package</a></dt>
-  <dd>Intended to be used in frontend development</dd>
+  <dd>Intended to be used in frontend or full-stack development</dd>
 
   <dt><a href="TemplatesCompiler">@yamato-daiwa/universal-reactive-templates-compiler — Templates Compiler</a></dt>
   <dd>Compiles Pug files to special JavaScript object represents the view similar to Svelte way.</dd>
@@ -65,13 +66,13 @@ The sequence may be changed during the development.
 </dl>
 
 
-## Quick Tutorials for React/Vue/Svelte Experiencers
+## Quick Tutorials for Angular/React/Vue/Svelte Experiencers
 ### Basic ~~"Hello, world"~~ Counter Application
 #### Code
 ##### "Counter.ydfr.pug" — The Component Template
 
 ```pug
-samp= $reativeState.currentValue
+samp= $reactiveState.currentValue
 
 .Counter-ActionBar
 
@@ -93,22 +94,27 @@ No plans to support HTML.
 ##### Counter.ts — The Component Logic
 
 ```ts
-import * as YDFR from "@yamato-daiwa/universal-reactive";
+import {
+  View,
+  ReactiveState,
+  Component,
+  EventHandler
+} from "@yamato-daiwa/universal-reactive";
 import componentTemplate from "./Counter.ydur.pug";
 
 
-@YDFR.View(componentTemplate)
-export default class Counter extends YDFR.Component {
+@View(componentTemplate)
+export default class Counter extends Component {
 
-  @YDFR.ReactiveState
+  @ReactiveState
   protected currentValue: number = 0;
 
-  @YDFR.EventHandler()
+  @EventHandler()
   protected onClickIncrementingButton(): void {
     this.currentValue++;
   }
 
-  @YDFR.EventHandler()
+  @EventHandler()
   protected onClickDecrementingButton(): void {
     this.currentValue--;
   }
@@ -121,14 +127,15 @@ export default class Counter extends YDFR.Component {
     the public static members and call them from outside (when it makes sense).
 + To import `componentTemplate` from Pug file correctly, you need the appropriate plugin for you project building
     system. 
-  Currently, the [Webpack loader](https://www.npmjs.com/package/@yamato-daiwa/universal-reactive-webpack-loader) is available.
+  Currently, the [Webpack loader](https://www.npmjs.com/package/@yamato-daiwa/universal-reactive-webpack-loader) is available
+    and build-in support available only in [https://www.npmjs.com/package/@yamato-daiwa/automation](/@yamato-daiwa/automation).
   The value of `componentTemplate` is _not_ the string with HTML code — the YDUR templates compiler builds the JavaScript 
-    object called "View" based on Pug code.
+    object called "the view" based on Pug code.
   Such an approach is Svelte-like, one advantage of it is better performance than DOM diffing as in React.
 + The `currentValue` field has been declared with `@YDFR.ReactiveState` decorator.
   It means the changing of this field will update the DOM depends on it.
   `currentValue` is accessible from template as `$reativeState.currentValue`.
-  Contrary to `$reativeState` state, there is the `$constantState` one.
+  Contrary to `$reativeState` state, there is the `$constantState` one which does not trigger the re-rendering.
 + The methods are accessible from the template by names as event handlers, but must be decorated by 
   `@YDFR.EventHandler()` decoratory. Unlike `@YDFR.ReactiveState`, it requires `()` becaue optionally the event hanling
   options may be passed.
@@ -136,22 +143,57 @@ export default class Counter extends YDFR.Component {
   about these fields have not been explicitly used.
 
 
-##### index.ts — The Entry Point
+##### CSR(SPA) Implementation
+
+Nothing extraordinary in comparison with React or Vue: there is just the initialization function which accepts the
+  the options object.
+As minimum, it is required to specify the mounting point selector (herewith exatcly one element must corresponding
+  to this selector) and the root component (no need to create the instance):
 
 ```ts
-import * as YDFR from "@yamato-daiwa/universal-reactive";
-import Counter from "./GUI_Components/Counter";
+import { initializeCSR_Application } from "@yamato-daiwa/universal-reactive/client";
+import Counter from "../GUI_Components/Counter";
 
 
-YDFR.initializeFrontendApplication({
+initializeCSR_Application({
   mountingPointSelector: "#APPLICATION_ROOT",
   rootComponent: Counter
 });
 ```
 
-You need at least one component to create the application instance.
-Once it defined, the application may be created by one function.
-Of course, the HTML element with ID `APPLICATION_ROOT` must exist to initialize the application succesfully. 
+The `initializeCSR_Application` function must be imported from `"@yamato-daiwa/universal-reactive/client"`, 
+  not `"@yamato-daiwa/universal-reactive"`.
+
+
+##### Universal Implementation
+###### How It Works
+
+First, how it works.
+Unlike React/Next or Vue/Nuxt, in YDUR the SSR scenario is respected from the early stage of development, so it is 
+  not the hacky adaptation of another library/framework to SSR.
+
+You are creating the simple server application intended to by build and run by Node.js.
+When the server application accepts the request,
+
+1. YDUR generates the script (the JavaScript code for the Browser environment) for the client side. 
+   For each application, this script will be unique because includes the logic of _your_ application.
+2. YDUR generates the HTML code of the complete page. It will include:
+   + The first view or your application
+   + The embedded script generated in step 1
+3. YDUR will respond with above HTML code.
+
+
+###### The Project Building Tool 
+
+If you are the user of Next or Nuxt, perhaps you are used to Next or Nuxt suggest the built-in project building
+  mechanism, not just SSR functionality.
+Is it good?
+"Definitely yes! It is effortless to initialize and launch the app!" – many developers will answer, and maybe they are 
+  right... but while you are not need the deep customization of the project building tool like the adding of some 
+  specific module loaders.
+Once you need (what is not so rare for the real project, not simplified synthetic examples for the learning),
+  it may become a hard challenge to override the project builders in Next or Nuxt.
+It is why the YDUR has not the built-in project building tool – you can use the tools to which you are used to using.
 
 
 ### Reactive and Constant State
