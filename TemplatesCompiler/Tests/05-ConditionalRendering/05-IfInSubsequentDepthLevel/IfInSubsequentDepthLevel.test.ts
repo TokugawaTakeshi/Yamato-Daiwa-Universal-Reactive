@@ -6,7 +6,7 @@ import { Logger } from "@yamato-daiwa/es-extensions";
 
 
 Testing.test(
-  "Lone If With Multiple Elements",
+  "If in Subsequent Depth Level",
   (): void => {
      Assert.strictEqual(
        generateViewObjectFormattedCode(

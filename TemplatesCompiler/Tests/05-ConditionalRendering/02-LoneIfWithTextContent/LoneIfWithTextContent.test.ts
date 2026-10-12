@@ -6,7 +6,7 @@ import { Logger } from "@yamato-daiwa/es-extensions";
 
 
 Testing.test(
-  "Lone If",
+  "Lone If with Text Content",
   (): void => {
      Assert.strictEqual(
        generateViewObjectFormattedCode(

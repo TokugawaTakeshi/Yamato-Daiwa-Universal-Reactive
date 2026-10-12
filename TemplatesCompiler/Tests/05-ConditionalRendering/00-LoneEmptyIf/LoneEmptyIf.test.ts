@@ -6,7 +6,7 @@ import { Logger } from "@yamato-daiwa/es-extensions";
 
 
 Testing.test(
-  "Lone If",
+  "Lone Empty If",
   (): void => {
      Assert.strictEqual(
        generateViewObjectFormattedCode(

@@ -1,22 +1,33 @@
-export default function initializeUniversalApplication(): void {
-export default function initializeUniversalApplication(
-  {
-    rootComponent: RootComponent,
-    rootComponentAbsolutePath__TEMPORARY,
-    projectRootDirectoryAbsolutePath__TEMPORARY,
-    sourceFilePathRelativeToCurrentWorkingDirectory,
-    portNumber,
-    temporaryFilesDirectoryPathRelativeToProjectRoot = ".ydur"
-  }: Readonly<{
-    rootComponent: new () => Component;
-    rootComponentAbsolutePath__TEMPORARY: string;
-    projectRootDirectoryAbsolutePath__TEMPORARY: string;
-    portNumber: number;
-    temporaryFilesDirectoryPathRelativeToProjectRoot?: string;
-    sourceFilePathRelativeToCurrentWorkingDirectory: string;
-  }>
-): void {
-type InitializationOptions =
+/* ━━━ < Imports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+import type Component from "../../Common/Component";
+
+/* ┅┅┅ Native Modules ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import Path from "path";
+import FileSystem from "fs";
+import HTTP from "http";
+import ChildProcess from "child_process";
+
+/* ┅┅┅ Domestic Libraries ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import {
+  Logger,
+  stringifyAndFormatArbitraryValue
+} from "@yamato-daiwa/es-extensions";
+import {
+  ConsoleApplicationLogger,
+  ImprovedFileSystem,
+  ImprovedPath
+} from "@yamato-daiwa/es-extensions-nodejs";
+
+/* ┅┅┅ Third-party Libraries ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import Handlebars from "handlebars";
+import JSDOM from "jsdom";
+import Chokidar from "chokidar";
+
+/* ┅┅┅ Internal Utils ┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅ */
+import getRootComponentPathRelativeToEntryPoint from "./getRootComponentPathRelativeToEntryPoint";
+/* ━━━ Imports > ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+
 type InitializationOptions =
 
     Readonly<{
@@ -103,6 +114,8 @@ class UniversalApplicationInitializerForServer {
     const clientScriptSourceFileAbsolutePath: string =
         Path.join(temporaryFilesDirectoryAbsolutePath, "EmbeddedClientScript.ts");
 
+    // FIXME This file itself rarely chaged. Only if path to root component will change.
+    // What actually change is the root component and all tree of it.
     ImprovedFileSystem.writeFileToPossiblyNotExistingDirectory({
       content: embeddedScriptSourceCode,
       filePath: clientScriptSourceFileAbsolutePath,
@@ -118,6 +131,11 @@ class UniversalApplicationInitializerForServer {
             argumentsVector,
             projectRootDirectoryAbsolutePath
           );
+    } else {
+      await UniversalApplicationInitializerForServer.buildClientScript(
+        argumentsVector,
+        projectRootDirectoryAbsolutePath
+      );
     }
 
     const generateHTML_Page: Handlebars.TemplateDelegate =
@@ -134,67 +152,168 @@ class UniversalApplicationInitializerForServer {
           )
         );
 
-  global.document = new JSDOM.JSDOM("<!DOCTYPE html><div id=\"APPLICATION_ROOT\"></div>").window.document;
+    const clientScript: string =
+        FileSystem.readFileSync(
+          Path.join(temporaryFilesDirectoryAbsolutePath, "EmbeddedClientScript.js"),
+          "utf-8"
+        );
+
+    global.document = new JSDOM.JSDOM("<!DOCTYPE html><div id=\"APPLICATION_ROOT\"></div>").window.document;
+
+    HTTP.
+
+        createServer(
+          (rawRequest: HTTP.IncomingMessage, rawResponse: HTTP.ServerResponse): void => {
+
+            Logger.logInfo({
+              title: "New Request",
+              description:
+                  `${ rawRequest.method }::${ rawRequest.url }\n${ stringifyAndFormatArbitraryValue(rawRequest.headers) }`
+            });
 
 
-  HTTP.
+            if (rawRequest.url !== "/") {
 
-      createServer(
-        (rawRequest: HTTP.IncomingMessage, rawResponse: HTTP.ServerResponse): void => {
+              rawResponse.statusCode = 404;
+              rawResponse.end();
 
-          Logger.logInfo({
-            title: "New Request",
-            description:
-                `${ rawRequest.method }::${ rawRequest.url }\n${ stringifyAndFormatArbitraryValue(rawRequest.headers) }`
-          });
+              return;
+
+            }
 
 
-          if (rawRequest.url !== "/") {
+            rawResponse.statusCode = 200;
+            rawResponse.setHeader("Content-Type", "text/html");
 
-            rawResponse.statusCode = 404;
+            const templateElement: HTMLTemplateElement = global.document.createElement("template");
+
+            templateElement.content.append(...new RootComponent().$DOM);
+
+            rawResponse.write(
+              generateHTML_Page({
+                title: "Sample",
+                content: templateElement.innerHTML,
+                script: clientScript
+              })
+            );
+
             rawResponse.end();
 
-            return;
+          }
+        ).
+
+        listen(
+          portNumber,
+          "127.0.0.1",
+          (): void => {
+            Logger.logSuccess({
+              title: "YDUR Server Started",
+              description: `Waiting for the requests on http://127.0.0.1:${ portNumber }`
+            });
+          }
+        ).
+
+        on(
+          "error",
+          (error: Error): void => {
+            Logger.logError({
+              errorType: "HTTP_RequestsServingBootstrapError",
+              title: "",
+              description: "",
+              occurrenceLocation: "server.startHTTP_RequestServingIfCorrespondingConfigurationDefined()",
+              caughtError: error
+            });
+          }
+        );
+
+  }
+
+  private static async provideIncrementalBuildingOfClientScript(
+    clientScriptSourceFileAbsolutePath: string,
+    argumentsVector: ReadonlyArray<string>,
+    projectRootDirectoryAbsolutePath: string
+  ): Promise<void> {
+
+    await UniversalApplicationInitializerForServer.buildClientScript(argumentsVector, projectRootDirectoryAbsolutePath);
+
+    Chokidar.
+        watch(clientScriptSourceFileAbsolutePath).
+        on(
+          "change",
+          (): void => {
+
+            Logger.logInfo({
+              title: "YDUR, Rebuilding Client Script",
+              description: "Changes detected in source code, rebuilding...",
+              compactLayout: true
+            });
+
+            UniversalApplicationInitializerForServer.
+                buildClientScript(argumentsVector, projectRootDirectoryAbsolutePath).
+                catch(Logger.logPromiseError);
 
           }
+        );
 
+  }
 
-          rawResponse.statusCode = 200;
-          rawResponse.setHeader("Content-Type", "text/html");
+  private static async buildClientScript(
+    argumentsVector: ReadonlyArray<string>,
+    projectRootDirectoryAbsolutePath: string
+  ): Promise<void> {
 
-          const templateElement: HTMLTemplateElement = global.document.createElement("template");
-          templateElement.content.append(...new RootComponent().$DOM);
+    const buildProcess: ChildProcess.ChildProcess =
+        ChildProcess.spawn(
+          argumentsVector[0],
+          argumentsVector.slice(1),
+          {
+            cwd: projectRootDirectoryAbsolutePath,
+            stdio: "inherit",
+            shell: true,
+            env: {
+              FORCE_COLOR: "1"
+            }
+          }
+        );
 
-          rawResponse.write(
-            generateHTML_Page({
-              title: "Sample",
-              content: templateElement.innerHTML
-            })
-          );
-          rawResponse.end();
+    return new Promise<void>(
+      (resolve: () => void, reject: (error: Error) => void): void => {
 
-        }
-      ).
+        buildProcess.on(
+          "exit",
+          (code: number | null): void => {
 
-      listen(
-        portNumber,
-        "127.0.0.1",
-        (): void => {
-          Logger.logSuccess({
-            title: "OK",
-            description: "Started"
-          });
-        }
-      ).
+            if (code === 0) {
 
-      on("error", (error: Error): void => {
-        Logger.logError({
-          errorType: "HTTP_RequestsServingBootstrapError",
-          title: "",
-          description: "",
-          occurrenceLocation: "server.startHTTP_RequestServingIfCorrespondingConfigurationDefined()",
-          caughtError: error
-        });
-      });
+              Logger.logSuccess({
+                title: "Build Complete",
+                description: "Script building command executed successfully"
+              });
+
+              resolve();
+
+            } else {
+
+              Logger.logError({
+                errorType: "BuildProcessError",
+                title: "Build Failed",
+                description: `Build process exited with code ${ code }`,
+                occurrenceLocation: "initializeUniversalApplication()"
+              });
+
+              reject(new Error("Exit code is not 0"));
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+  }
 
 }
+
+
+export default UniversalApplicationInitializerForServer.initialize;

@@ -30,7 +30,7 @@ The following feature may be pros of cons depending on your preferences.
 + [Pug](https://pugjs.org/api/getting-started.html) is the only language for templates. No plain HTML support planned. 
 + No new file names extensions like `.vue` or `.jsx`.
 + No new syntaxes like Vue single file components or JSX. Just plain Pug and TypeScript.
-+ Built-in SSR. Unlike Nuxt/Next, the SSR scenario was respected since ealry stage of development
++ Built-in SSR. Unlike Nuxt/Next, the SSR scenario was respected since early stage of development.
 + The project building tool like Webpack is required.
 
 
@@ -176,6 +176,26 @@ Once you need (what is not so rare for the real project, not simplified syntheti
 It is why the YDUR has not the built-in project building tool – you can use the tools to which you are used to using.
 
 
+###### The Entry Point
+
+In universal application case, the initialization function will include the following options:
+
+```javascript
+import * as YDUR from "@yamato-daiwa/universal-reactive/server";
+import Counter from "../GUI_Components/Counter";
+
+
+YDUR.initializeUniversalApplication({
+  rootComponent: Counter,
+  projectRootDirectoryAbsolutePath: __PROJECT_ROOT_DIRECTORY__ALWAYS_FORWARD_SLASHES_PATH_SEPARATORS__YDA__,
+  isDevelopmentMode: __IS_LOCAL_DEVELOPMENT_BUILDING_MODE__YDA__,
+  sourceFilePathRelativeToCurrentWorkingDirectory: "Source/Universal/ServerEntryPoint.ts",
+  portNumber: 8080,
+  scriptBuildingCommand: "npm run \"Build Client for Universal Mode\""
+});
+```
+
+[//]: # (TODO 再開点 SPA Implementation)
 ##### index.ts — The Entry Point
 
 ```ts

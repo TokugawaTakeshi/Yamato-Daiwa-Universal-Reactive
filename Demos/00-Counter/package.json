@@ -1,12 +1,12 @@
 {
   "private": true,
   "dependencies": {
-    "@yamato-daiwa/universal-reactive": "../../Core",
+    "@yamato-daiwa/universal-reactive": "../../Core"
   },
   "devDependencies": {
-    "@types/node": "26.0.0",
+    "@types/node": "24.19.2",
     "@yamato-daiwa/automation": "../../../../IntelliJ IDEA/InHouseDevelopment/YamatoDaiwaAutomation/MainPackage",
-    "@yamato-daiwa/style_guides": "0.14.2",
+    "@yamato-daiwa/style_guides": "0.15.0",
     "nodemon": "3.1.14",
     "rimraf": "6.1.3",
     "typescript": "6.0.3"
