@@ -42,9 +42,9 @@
     }
   },
   "dependencies": {
-    "@yamato-daiwa/es-extensions": "1.9.3",
-    "@yamato-daiwa/es-extensions-browserjs": "1.9.3",
-    "@yamato-daiwa/es-extensions-nodejs": "1.9.3",
+    "@yamato-daiwa/es-extensions": "1.9.4",
+    "@yamato-daiwa/es-extensions-browserjs": "1.9.4",
+    "@yamato-daiwa/es-extensions-nodejs": "1.9.4",
     "chokidar": "5.0.0",
     "handlebars": "4.7.10",
     "jsdom": "26.1.0"
@@ -52,7 +52,7 @@
   "devDependencies": {
     "@types/jsdom": "28.0.0",
     "@types/node": "24.13.6",
-    "@yamato-daiwa/automation": "../../../IntelliJ IDEA/InHouseDevelopment/YamatoDaiwaAutomation/MainPackage",
+    "@yamato-daiwa/automation": "0.9.4-special.0",
     "@yamato-daiwa/style_guides": "0.15.0",
     "nodemon": "3.1.14",
     "rimraf": "6.1.3",

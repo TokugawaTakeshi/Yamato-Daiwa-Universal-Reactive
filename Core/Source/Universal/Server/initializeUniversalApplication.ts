@@ -28,48 +28,42 @@ import getRootComponentPathRelativeToEntryPoint from "./getRootComponentPathRela
 /* ━━━ Imports > ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 
-type InitializationOptions =
+export class UniversalApplicationInitializerForServer {
 
-    Readonly<{
-      rootComponent: new () => Component;
-      projectRootDirectoryAbsolutePath: string;
-      isDevelopmentMode: boolean;
-      portNumber: number;
-      temporaryFilesDirectoryPathRelativeToProjectRoot?: string;
-      sourceFilePathRelativeToCurrentWorkingDirectory: string;
-      scriptBuildingCommand: string;
-    }>;
-
-
-class UniversalApplicationInitializerForServer {
-
-  public static initialize(initializationOptions: InitializationOptions): void {
-
+  static {
     Logger.setImplementation(ConsoleApplicationLogger);
+  }
 
+
+  public static initialize(
+    initializationOptions: UniversalApplicationInitializerForServer.InitializationOptions
+  ): void {
     UniversalApplicationInitializerForServer.
         initializeAsynchronously(initializationOptions).
         catch(Logger.logPromiseError);
-
   }
 
-  private static async initializeAsynchronously(
+  public static generateClientScriptSourceCode(
     {
-      rootComponent: RootComponent,
       projectRootDirectoryAbsolutePath,
-      isDevelopmentMode,
       sourceFilePathRelativeToCurrentWorkingDirectory,
-      portNumber,
       temporaryFilesDirectoryPathRelativeToProjectRoot = ".ydur",
-      scriptBuildingCommand
-    }: InitializationOptions
-  ): Promise<void> {
-
-    const temporaryFilesDirectoryAbsolutePath: string =
-        Path.join(projectRootDirectoryAbsolutePath, temporaryFilesDirectoryPathRelativeToProjectRoot);
-
-    const entryPointSourceFileAbsolutePath: string =
-        Path.join(projectRootDirectoryAbsolutePath, sourceFilePathRelativeToCurrentWorkingDirectory);
+      entryPointSourceFileAbsolutePath =
+          Path.join(projectRootDirectoryAbsolutePath, sourceFilePathRelativeToCurrentWorkingDirectory),
+      temporaryFilesDirectoryAbsolutePath =
+          Path.join(projectRootDirectoryAbsolutePath, temporaryFilesDirectoryPathRelativeToProjectRoot)
+    }:
+      Pick<
+        UniversalApplicationInitializerForServer.InitializationOptions,
+          "projectRootDirectoryAbsolutePath" |
+          "sourceFilePathRelativeToCurrentWorkingDirectory" |
+          "temporaryFilesDirectoryPathRelativeToProjectRoot"
+      > &
+      Readonly<{
+        entryPointSourceFileAbsolutePath?: string;
+        temporaryFilesDirectoryAbsolutePath?: string;
+      }>
+  ): void {
 
     const rootComponentFilePathRelativeToEntryPoint: string =
         getRootComponentPathRelativeToEntryPoint(entryPointSourceFileAbsolutePath);
@@ -88,54 +82,140 @@ class UniversalApplicationInitializerForServer {
           rootComponentFilePathRelativeToEntryPoint
         );
 
-    const embeddedScriptSourceCode: string = Handlebars.
-      compile(
-        FileSystem.readFileSync(
-          Path.join(
-            projectRootDirectoryAbsolutePath,
-            "node_modules",
-            "@yamato-daiwa",
-            "universal-reactive",
-            "EmbeddedClientScript.hbs"
-          ),
-          "utf8"
-        )
-      )(
-        {
-          rootComponentFilePathRelativeToEntryPoint:
-              ImprovedPath.computeRelativePath({
-                basePath: temporaryFilesDirectoryAbsolutePath,
-                comparedPath: rootComponentAbsolutePath,
-                alwaysForwardSlashSeparators: true
-              }).replace(/.ts$/u, "")
-        }
-      );
+    const embeddedScriptSourceCode: string =
+        Handlebars.
+            compile(
+              FileSystem.readFileSync(
+                Path.join(
+                  projectRootDirectoryAbsolutePath,
+                  "node_modules",
+                  "@yamato-daiwa",
+                  "universal-reactive",
+                  "EmbeddedClientScript.hbs"
+                ),
+                "utf8"
+              )
+            )({
+              rootComponentFilePathRelativeToEntryPoint:
+                  ImprovedPath.
+                      computeRelativePath({
+                        basePath: temporaryFilesDirectoryAbsolutePath,
+                        comparedPath: rootComponentAbsolutePath,
+                        alwaysForwardSlashSeparators: true
+                      }).
+                      replace(/.ts$/u, "")
+            });
 
     const clientScriptSourceFileAbsolutePath: string =
         Path.join(temporaryFilesDirectoryAbsolutePath, "EmbeddedClientScript.ts");
 
-    // FIXME This file itself rarely chaged. Only if path to root component will change.
-    // What actually change is the root component and all tree of it.
     ImprovedFileSystem.writeFileToPossiblyNotExistingDirectory({
       content: embeddedScriptSourceCode,
       filePath: clientScriptSourceFileAbsolutePath,
       synchronously: true
     });
 
-    const argumentsVector: Array<string> = scriptBuildingCommand.match(/"[^"]*"|'[^']*'|\S+/gu) ?? [];
+    Logger.logSuccess({
+      title: "YDUR, Client Script Source Code has been Generated",
+      description: clientScriptSourceFileAbsolutePath,
+      compactLayout: true
+    });
+
+  }
+
+
+  private static async initializeAsynchronously(
+    {
+      rootComponent: RootComponent,
+      projectRootDirectoryAbsolutePath,
+      isDevelopmentMode,
+      sourceFilePathRelativeToCurrentWorkingDirectory,
+      portNumber,
+      temporaryFilesDirectoryPathRelativeToProjectRoot = ".ydur",
+      incrementalDevelopmentBuildingOfClientScriptCommand,
+      productionBuildingOfClientScriptCommand
+    }: UniversalApplicationInitializerForServer.InitializationOptions
+  ): Promise<void> {
+
+    const entryPointSourceFileAbsolutePath: string =
+        Path.join(projectRootDirectoryAbsolutePath, sourceFilePathRelativeToCurrentWorkingDirectory);
+
+    const temporaryFilesDirectoryAbsolutePath: string =
+        Path.join(projectRootDirectoryAbsolutePath, temporaryFilesDirectoryPathRelativeToProjectRoot);
+
+    UniversalApplicationInitializerForServer.generateClientScriptSourceCode({
+      projectRootDirectoryAbsolutePath,
+      sourceFilePathRelativeToCurrentWorkingDirectory,
+      temporaryFilesDirectoryPathRelativeToProjectRoot,
+      entryPointSourceFileAbsolutePath,
+      temporaryFilesDirectoryAbsolutePath
+    });
 
     if (isDevelopmentMode) {
-      await UniversalApplicationInitializerForServer.
-          provideIncrementalBuildingOfClientScript(
-            clientScriptSourceFileAbsolutePath,
-            argumentsVector,
-            projectRootDirectoryAbsolutePath
+      Chokidar.
+          watch(entryPointSourceFileAbsolutePath).
+          on(
+            "change",
+            (): void => {
+
+              Logger.logInfo({
+                title: "YDUR, Entry Point has Updated",
+                description: "Re-generating the client script...",
+                compactLayout: true
+              });
+
+              UniversalApplicationInitializerForServer.generateClientScriptSourceCode({
+                projectRootDirectoryAbsolutePath,
+                sourceFilePathRelativeToCurrentWorkingDirectory,
+                temporaryFilesDirectoryPathRelativeToProjectRoot,
+                entryPointSourceFileAbsolutePath,
+                temporaryFilesDirectoryAbsolutePath
+              });
+
+            }
           );
+    }
+
+
+    const clientScriptOutputFileAbsolutePath: string =
+        Path.join(temporaryFilesDirectoryAbsolutePath, "EmbeddedClientScript.js");
+
+    const argumentsVector: Array<string> =
+        (isDevelopmentMode ? incrementalDevelopmentBuildingOfClientScriptCommand : productionBuildingOfClientScriptCommand).
+            match(/"[^"]*"|'[^']*'|\S+/gu) ?? [];
+
+    await UniversalApplicationInitializerForServer.
+        buildClientScript({
+          argumentsVector,
+          projectRootDirectoryAbsolutePath,
+          mustWaitForExistingOfProcess: !isDevelopmentMode
+        });
+
+    let clientScript: string = "console.log(\"Building the client script\")";
+
+    if (isDevelopmentMode) {
+
+      Chokidar.
+          watch(clientScriptOutputFileAbsolutePath).
+          on(
+            "change",
+            (): void => {
+
+              Logger.logInfo({
+                title: "YDUR, Client Script Updating Detected",
+                description: "New client script will be returned on reloading of browser",
+                compactLayout: true
+              });
+
+              clientScript = FileSystem.readFileSync(clientScriptOutputFileAbsolutePath, "utf-8");
+
+            }
+          );
+
     } else {
-      await UniversalApplicationInitializerForServer.buildClientScript(
-        argumentsVector,
-        projectRootDirectoryAbsolutePath
-      );
+
+      clientScript = FileSystem.readFileSync(clientScriptOutputFileAbsolutePath, "utf-8");
+
     }
 
     const generateHTML_Page: Handlebars.TemplateDelegate =
@@ -152,13 +232,8 @@ class UniversalApplicationInitializerForServer {
           )
         );
 
-    const clientScript: string =
-        FileSystem.readFileSync(
-          Path.join(temporaryFilesDirectoryAbsolutePath, "EmbeddedClientScript.js"),
-          "utf-8"
-        );
-
     global.document = new JSDOM.JSDOM("<!DOCTYPE html><div id=\"APPLICATION_ROOT\"></div>").window.document;
+    const templateElement: HTMLTemplateElement = global.document.createElement("template");
 
     HTTP.
 
@@ -170,7 +245,6 @@ class UniversalApplicationInitializerForServer {
               description:
                   `${ rawRequest.method }::${ rawRequest.url }\n${ stringifyAndFormatArbitraryValue(rawRequest.headers) }`
             });
-
 
             if (rawRequest.url !== "/") {
 
@@ -185,19 +259,19 @@ class UniversalApplicationInitializerForServer {
             rawResponse.statusCode = 200;
             rawResponse.setHeader("Content-Type", "text/html");
 
-            const templateElement: HTMLTemplateElement = global.document.createElement("template");
-
-            templateElement.content.append(...new RootComponent().$DOM);
+            templateElement.content.replaceChildren(...new RootComponent().$DOM);
 
             rawResponse.write(
               generateHTML_Page({
-                title: "Sample",
+                title: "YDUR",
                 content: templateElement.innerHTML,
                 script: clientScript
               })
             );
 
             rawResponse.end();
+
+            templateElement.content.replaceChildren();
 
           }
         ).
@@ -218,9 +292,9 @@ class UniversalApplicationInitializerForServer {
           (error: Error): void => {
             Logger.logError({
               errorType: "HTTP_RequestsServingBootstrapError",
-              title: "",
-              description: "",
-              occurrenceLocation: "server.startHTTP_RequestServingIfCorrespondingConfigurationDefined()",
+              title: "YDUR Server Starting Error",
+              description: "The following error has occurred during the starting of YDUR server.",
+              occurrenceLocation: "server.generateClientScriptSourceCode(options)",
               caughtError: error
             });
           }
@@ -228,38 +302,16 @@ class UniversalApplicationInitializerForServer {
 
   }
 
-  private static async provideIncrementalBuildingOfClientScript(
-    clientScriptSourceFileAbsolutePath: string,
-    argumentsVector: ReadonlyArray<string>,
-    projectRootDirectoryAbsolutePath: string
-  ): Promise<void> {
-
-    await UniversalApplicationInitializerForServer.buildClientScript(argumentsVector, projectRootDirectoryAbsolutePath);
-
-    Chokidar.
-        watch(clientScriptSourceFileAbsolutePath).
-        on(
-          "change",
-          (): void => {
-
-            Logger.logInfo({
-              title: "YDUR, Rebuilding Client Script",
-              description: "Changes detected in source code, rebuilding...",
-              compactLayout: true
-            });
-
-            UniversalApplicationInitializerForServer.
-                buildClientScript(argumentsVector, projectRootDirectoryAbsolutePath).
-                catch(Logger.logPromiseError);
-
-          }
-        );
-
-  }
-
   private static async buildClientScript(
-    argumentsVector: ReadonlyArray<string>,
-    projectRootDirectoryAbsolutePath: string
+    {
+      argumentsVector,
+      projectRootDirectoryAbsolutePath,
+      mustWaitForExistingOfProcess
+    }: Readonly<{
+      argumentsVector: ReadonlyArray<string>;
+      projectRootDirectoryAbsolutePath: string;
+      mustWaitForExistingOfProcess: boolean;
+    }>
   ): Promise<void> {
 
     const buildProcess: ChildProcess.ChildProcess =
@@ -276,42 +328,61 @@ class UniversalApplicationInitializerForServer {
           }
         );
 
-    return new Promise<void>(
-      (resolve: () => void, reject: (error: Error) => void): void => {
+    if (mustWaitForExistingOfProcess) {
+      return new Promise<void>(
+        (resolve: () => void, reject: (error: Error) => void): void => {
 
-        buildProcess.on(
-          "exit",
-          (code: number | null): void => {
+          buildProcess.on(
+            "exit",
+            (code: number | null): void => {
 
-            if (code === 0) {
+              if (code === 0) {
 
-              Logger.logSuccess({
-                title: "Build Complete",
-                description: "Script building command executed successfully"
-              });
+                Logger.logSuccess({
+                  title: "Build Complete",
+                  description: "Script building command executed successfully"
+                });
 
-              resolve();
+                resolve();
 
-            } else {
+              } else {
 
-              Logger.logError({
-                errorType: "BuildProcessError",
-                title: "Build Failed",
-                description: `Build process exited with code ${ code }`,
-                occurrenceLocation: "initializeUniversalApplication()"
-              });
+                Logger.logError({
+                  errorType: "BuildProcessError",
+                  title: "Build Failed",
+                  description: `Build process exited with code ${ code }`,
+                  occurrenceLocation: "UniversalApplicationInitializerForServer.buildClientScript()"
+                });
 
-              reject(new Error("Exit code is not 0"));
+                reject(new Error("Exit code is not 0"));
+
+              }
 
             }
+          );
 
-          }
-        );
-
-      }
-    );
+        }
+      );
+    }
 
   }
+
+}
+
+export namespace UniversalApplicationInitializerForServer {
+
+  export type InitializationOptions =
+
+      Readonly<{
+        rootComponent: new () => Component;
+        projectRootDirectoryAbsolutePath: string;
+        isDevelopmentMode: boolean;
+        portNumber: number;
+        temporaryFilesDirectoryPathRelativeToProjectRoot?: string;
+        sourceFilePathRelativeToCurrentWorkingDirectory: string;
+        incrementalDevelopmentBuildingOfClientScriptCommand: string;
+        productionBuildingOfClientScriptCommand: string;
+      }>;
 
 }
 

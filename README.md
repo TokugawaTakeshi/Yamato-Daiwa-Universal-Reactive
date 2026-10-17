@@ -213,6 +213,31 @@ YDUR.initializeUniversalApplication({
   portNumber: 8080,
   scriptBuildingCommand: "npm run \"Build Client for Universal Mode\""
 });
+```
+
+<dl>
+
+  <dt><code>rootComponent</code></dt>
+  <dd>The root component of your application. Explained above.</dd>
+
+  <dt><code>projectRootDirectoryAbsolutePath</code></dt>
+  <dd>
+    In short, the absolute path of where the <code>package.json</code> of your project exists.
+    Currently this path can not be detected automatically because <code>__dirname</code> and <code>__filename</code> 
+      constants are project building tool-dependent while the output file may be arbitrary deep in subdirectories of 
+      your project top level, so <code>process.cwd()</code> will not refer to the directory with <code>package.json</code>.
+    In <b>YDA</b> case, it provides the <code>__PROJECT_ROOT_DIRECTORY__ALWAYS_FORWARD_SLASHES_PATH_SEPARATORS__YDA__</code>
+      global contant but requires <b>yda.config.yaml</b> file be in same depth level as <code>package.json</code>.
+  </dd>
+  <dt><code>isDevelopmentMode</code></dt>
+  <dd></dd>
+  
+
+</dl>
+
+
+
+###### `projectRootDirectoryAbsolutePath`
 ### Reactive and Constant State
 
 Some state fields are not intended to be updated during the component lifecycle.
