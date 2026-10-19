@@ -10,10 +10,10 @@ Testing.test(
   (): void => {
      Assert.strictEqual(
        generateViewObjectFormattedCode(
-         "05-ConditionalRendering/03-LoneIfsWithSingleElement/LoneIfWithSingleElement.test.pug"
+         "05-ConditionalRendering/03-LoneIfWithSingleElement/LoneIfWithSingleElement.test.pug"
        ),
        getExpectedFormatedViewObjectCodeFromFile(
-         "05-ConditionalRendering/03-LoneIfsWithSingleElement/LoneIfWithSingleElement.test.expected.js"
+         "05-ConditionalRendering/03-LoneIfWithSingleElement/LoneIfWithSingleElement.test.expected.js"
        )
      );
   }

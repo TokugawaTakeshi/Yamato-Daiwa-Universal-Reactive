@@ -6,7 +6,7 @@
     <typescript-loader value="TSX" />
     <envs />
     <scope-kind value="TEST_FILE" />
-    <test-file value="$PROJECT_DIR$/Tests/05-ConditionalRendering/03-LoneIfsWithSingleElement/LoneIfsWithSingleElement.test.ts" />
+    <test-file value="$PROJECT_DIR$/Tests/05-ConditionalRendering/03-LoneIfWithSingleElement/LoneIfWithSingleElement.test.ts" />
     <method v="2" />
   </configuration>
 </component>
