@@ -1,0 +1,112 @@
+$projectBuilding:
+
+  $commonSettings:
+
+    $selectiveExecutions:
+
+      SPA:
+
+        $tasksAndSourceFilesSelection:
+          $markupProcessing: [ ClientEntryPoint ]
+          $ECMA_ScriptLogicProcessing: [ SPA ]
+
+        $browserLiveReloadingSetupID: SPA
+
+      Universal-Server:
+
+        $tasksAndSourceFilesSelection:
+          $ECMA_ScriptLogicProcessing: [ Universal-Server ]
+
+      Universal-Client:
+        $tasksAndSourceFilesSelection:
+          $ECMA_ScriptLogicProcessing: [ Universal-Client ]
+
+  $markupProcessing:
+
+    $common:
+      $buildingModeDependent:
+        $localDevelopment:
+          $mustResolveResourcesPointersToRelativePaths: true
+
+    $entryPointsGroups:
+
+      ClientEntryPoint:
+
+        $singleEntryPointSourceFileRelativePath: Source/CSR/ClientEntryPoint.pug
+
+        $buildingModeDependent:
+          $localDevelopment:
+            $outputTopDirectoryRelativePath: Build/SPA
+
+
+  $ECMA_ScriptLogicProcessing:
+
+    $preprocessorVariablesDefinitions__EXPERIMENTAL: ECMAScriptPreprocessorVariables.yaml
+
+    $entryPointsGroups:
+
+      SPA:
+
+        $singleEntryPointSourceFileRelativePath: Source/CSR/ClientEntryPoint.ts
+
+        $targetRuntime:
+          $type: BROWSER
+
+        $preprocessorVariables:
+          __IS_UNIVERSAL__YDUR__: false
+          __IS_CSR__YDUR__: true
+          __IS_SSR__YDUR__: false
+
+        $buildingModeDependent:
+          $localDevelopment:
+            $outputTopDirectoryRelativePath: Build/SPA
+
+      Universal-Server:
+
+        $singleEntryPointSourceFileRelativePath: Source/Universal/ServerEntryPoint.ts
+
+        $targetRuntime:
+          $type: NODEJS
+          $minimalVersion:
+            $major: 22
+            $minor: 14
+
+        $preprocessorVariables:
+          __IS_UNIVERSAL__YDUR__: true
+          __IS_CSR__YDUR__: false
+          __IS_SSR__YDUR__: true
+
+        $buildingModeDependent:
+          $localDevelopment:
+            $outputTopDirectoryRelativePath: Build
+
+      Universal-Client:
+
+        $singleEntryPointSourceFileRelativePath: .ydur/EmbeddedClientScript.ts
+
+        $targetRuntime:
+          $type: BROWSER
+
+        $preprocessorVariables:
+          __IS_UNIVERSAL__YDUR__: true
+          __IS_CSR__YDUR__: true
+          __IS_SSR__YDUR__: false
+
+        $buildingModeDependent:
+          $production:
+            $outputTopDirectoryRelativePath: .ydur
+            $revisioning: { $disable: true }
+
+
+  $browserLiveReloading:
+
+    $setups:
+
+      SPA:
+
+        $localServer:
+
+          $rootDirectoryRelativePath: Build/SPA
+          $customStartingFileNameWithExtension: ClientEntryPoint.html
+
+        $openInBrowsers: chrome

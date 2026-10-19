@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Lone If With Single Element" type="NodeJsTestRunner" folderName="05 - Conditional Rendering">
+    <node-interpreter value="project" />
+    <working-dir value="$PROJECT_DIR$" />
+    <language value="TYPE_SCRIPT" />
+    <typescript-loader value="TSX" />
+    <envs />
+    <scope-kind value="TEST_FILE" />
+    <test-file value="$PROJECT_DIR$/Tests/05-ConditionalRendering/03-LoneIfWithSingleElement/LoneIfWithSingleElement.test.ts" />
+    <method v="2" />
+  </configuration>
+</component>

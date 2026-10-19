@@ -1,5 +1,6 @@
-Distributable/
-Tests/Build/
+client.js
+server.js
+GeneratedTypes/
 
 node_modules/
 

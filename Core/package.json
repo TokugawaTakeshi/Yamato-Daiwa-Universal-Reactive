@@ -1,6 +1,6 @@
 {
   "name": "@yamato-daiwa/universal-reactive",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OOP-based library for frontend development.",
   "keywords": [
     "frontend"
@@ -20,24 +20,47 @@
     "email": "tokugawa.takesi@gmail.com"
   },
   "files": [
-    "Distributable"
+    "GeneratedTypes",
+    "client.js",
+    "server.js",
+    "PageTemplate.hbs",
+    "EmbeddedClientScript.hbs"
   ],
-  "module": "./Distributable/index.js",
-  "types": "./Distributable/index.d.ts",
+  "types": "./GeneratedTypes",
+  "exports": {
+    ".": {
+      "types": "./GeneratedTypes/index.d.ts",
+      "default": "./index.js"
+    },
+    "./server": {
+      "types": "./GeneratedTypes/server.d.ts",
+      "default": "./server.js"
+    },
+    "./client": {
+      "types": "./GeneratedTypes/client.d.ts",
+      "default": "./client.js"
+    }
+  },
   "dependencies": {
-    "@yamato-daiwa/es-extensions": "1.8.4",
-    "@yamato-daiwa/es-extensions-browserjs": "1.8.4"
+    "@yamato-daiwa/es-extensions": "1.9.4",
+    "@yamato-daiwa/es-extensions-browserjs": "1.9.4",
+    "@yamato-daiwa/es-extensions-nodejs": "1.9.4",
+    "chokidar": "5.0.0",
+    "handlebars": "4.7.10",
+    "jsdom": "26.1.0"
   },
   "devDependencies": {
-    "@yamato-daiwa/automation": "0.9.0-alpha.3",
-    "@yamato-daiwa/frontend": "2.0.0-beta.11",
-    "@yamato-daiwa/style_guides": "0.11.2",
-    "rimraf": "6.1.2",
-    "typescript": "5.9.3"
+    "@types/jsdom": "28.0.0",
+    "@types/node": "24.13.6",
+    "@yamato-daiwa/automation": "0.9.4-special.0",
+    "@yamato-daiwa/style_guides": "0.15.0",
+    "nodemon": "3.1.14",
+    "rimraf": "6.1.3",
+    "typescript": "6.0.3"
   },
   "scripts": {
     "Lint": "eslint",
-    "Run Tests": "yda build --selectiveExecution Tests --mode LOCAL_DEVELOPMENT",
-    "Rebuild Distributable": "rimraf Distributable && yda build --selectiveExecution Distributable --mode PRODUCTION && tsc --project tsconfig.declarations.json --declaration --emitDeclarationOnly --outDir Distributable"
+    "Run Demos": "yda build --selectiveExecution Demos --mode LOCAL_DEVELOPMENT",
+    "Rebuild Distributable": "rimraf GeneratedTypes && yda build --selectiveExecution Distributable --mode PRODUCTION && tsc --project tsconfig.declarations.json --declaration --emitDeclarationOnly --outDir GeneratedTypes"
   }
 }

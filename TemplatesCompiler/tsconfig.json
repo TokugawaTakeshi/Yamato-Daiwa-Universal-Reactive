@@ -1,27 +1,15 @@
 {
   "compilerOptions": {
 
-    "target": "ES2021",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "target": "ESNext",
 
-    "strict": true,
+    "types": [ "node" ],
+
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
+    "skipLibCheck": true
 
-    "removeComments": true,
-
-    "outDir": "Distributable/",
-    "declaration": true
-
-  },
-
-  "include": [
-    "Source/**/*",
-    "Project.d.ts"
-  ]
+  }
 
 }

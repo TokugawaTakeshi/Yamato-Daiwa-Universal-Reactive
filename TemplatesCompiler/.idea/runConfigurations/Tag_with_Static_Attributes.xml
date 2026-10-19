@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tag with Static Attributes" type="NodeJsTestRunner" folderName="00-Simple">
+  <configuration default="false" name="Tag with Static Attributes" type="NodeJsTestRunner" folderName="03 - Tag with Attributes">
     <node-interpreter value="project" />
     <working-dir value="$PROJECT_DIR$" />
     <language value="TYPE_SCRIPT" />
     <typescript-loader value="TSX" />
     <envs />
     <scope-kind value="TEST_FILE" />
-    <test-file value="$PROJECT_DIR$/Tests/00-Simple/05-TagWithStaticAttributes/TagWithStaticAttributes.test.ts" />
+    <test-file value="$PROJECT_DIR$/Tests/03-TagWithAttributes/00-Static/TagWithStaticAttributes.test.ts" />
     <method v="2" />
   </configuration>
 </component>

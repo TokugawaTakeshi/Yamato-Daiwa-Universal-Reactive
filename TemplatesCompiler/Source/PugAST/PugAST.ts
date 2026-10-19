@@ -6,7 +6,10 @@ namespace PugAST {
     tag = "Tag",
     code = "Code",
     text = "Text",
-    conditional = "Conditional"
+    conditional = "Conditional",
+    singleLineComment = "Comment",
+    blockComment = "BlockComment"
+
   }
 
   type JavaScriptExpression = string;
@@ -86,7 +89,34 @@ namespace PugAST {
   };
 
 
-    /* ━━━ Text ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  /* ━━━ Comments ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  export type CommonComment =
+
+    ValueNode &
+
+    {
+
+      /** @description Whether the comment should appear when rendered */
+      buffer: boolean;
+
+    };
+
+  export type SingleLineComment =
+
+    CommonComment &
+
+    { type: NodeTypes.singleLineComment; };
+
+  export type BlockComment =
+
+    BlockNode &
+
+    CommonComment &
+
+    { type: NodeTypes.blockComment; };
+
+
+  /* ━━━ Text ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   export type Text =
 
       ValueNode &
